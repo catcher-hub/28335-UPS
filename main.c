@@ -1,30 +1,30 @@
 /*
  *  FileName:      main.c
- *  Describe:      2019ÄêµçÈüBÌâ--µ¥Ïà²»¼ä¶ÏµçÔ´
+ *  Describe:      2019å¹´ç”µèµ›Bé¢˜--å•ç›¸ä¸é—´æ–­ç”µæº
  *  Creator:       YellowNew
  *  Encoding:      GBK
  *  Date:          2021.9.14
  */
 
-/* Í·ÎÄ¼ş°üº¬ */
+/* å¤´æ–‡ä»¶åŒ…å« */
 #include "main.h"
-
-/* ÈÎÎñº¯ÊıµÄÉùÃ÷  */
-// ·ÖÖ§¸¸½Úµã
+int tantan=1;
+/* ä»»åŠ¡å‡½æ•°çš„å£°æ˜  */
+// åˆ†æ”¯çˆ¶èŠ‚ç‚¹
 void A0(void);
 void B0(void);
 
-// A·ÖÖ§
-void A1(void);								// Ç°¼¶boostºÍºó¼¶Äæ±äÓĞĞ§ÖµADC²ÉÑùÂË²¨
-void A2(void);								// ÄâË«ºãÑ¹ºãÁ÷PID
+// Aåˆ†æ”¯
+void A1(void);								// å‰çº§boostå’Œåçº§é€†å˜æœ‰æ•ˆå€¼ADCé‡‡æ ·æ»¤æ³¢
+void A2(void);								// æ‹ŸåŒæ’å‹æ’æµPID
 
-// B·ÖÖ§
-void B1(void);								// Äâ¶¨OledÏÔÊ¾
+// Båˆ†æ”¯
+void B1(void);								// æ‹Ÿå®šOledæ˜¾ç¤º
 
-/* È«¾Ö±äÁ¿ÉùÃ÷ */
-void (*Alpha_State_Ptr)(void);		        // »ù´¡×´Ì¬Ö¸Õë£¬AB·ÖÖ§¸¸
-void (*A_Task_Ptr)(void);				    // AÈÎÎñ·ÖÖ§º¯ÊıÖ¸Õë
-void (*B_Task_Ptr)(void);				    // BÈÎÎñ·ÖÖ§º¯ÊıÖ¸Õë
+/* å…¨å±€å˜é‡å£°æ˜ */
+void (*Alpha_State_Ptr)(void);		        // åŸºç¡€çŠ¶æ€æŒ‡é’ˆï¼ŒABåˆ†æ”¯çˆ¶
+void (*A_Task_Ptr)(void);				    // Aä»»åŠ¡åˆ†æ”¯å‡½æ•°æŒ‡é’ˆ
+void (*B_Task_Ptr)(void);				    // Bä»»åŠ¡åˆ†æ”¯å‡½æ•°æŒ‡é’ˆ
 interrupt void EPWM2_INT(void);
 
 
@@ -37,13 +37,13 @@ char Str[10];
 //Uint16 Key_flg = 0;
 int Key_flag = 0;
 
-/* Ö÷º¯Êı */
+/* ä¸»å‡½æ•° */
 int main(void)
     {
-//TODO: ³õÊ¼»¯ÏµÍ³
+//TODO: åˆå§‹åŒ–ç³»ç»Ÿ
  	InitSystem();
 
-//TODO: ³õÊ¼»¯Æ¬ÄÚÍâÉè
+//TODO: åˆå§‹åŒ–ç‰‡å†…å¤–è®¾
 	InitTaskTimer(TASKA_FRQ,TASKB_FRQ);
 	InitEpwm();
 	InitAdcToDMA();
@@ -51,13 +51,13 @@ int main(void)
     IICA_Init();
     OLED_Init();
 
-//TODO: ²ÎÊı³õÊ¼»¯
+//TODO: å‚æ•°åˆå§‹åŒ–
 	Init_Spwm(&m_spwm);
 	PidInit_Boost(&m_PidBoost);
 	PidInit_Inverter(&m_PidInverter);
 	setupLEDGPIO();
 
-//TODO: Ê¹ÄÜGPIO22Òı½ÅÓÃÓÚ¼à¿Ø
+//TODO: ä½¿èƒ½GPIO22å¼•è„šç”¨äºç›‘æ§
 	EALLOW;
 	GpioCtrlRegs.GPAMUX2.bit.GPIO20 = 0;    // GPIO pin
 	GpioCtrlRegs.GPADIR.bit.GPIO20 = 1;     // Output pin
@@ -66,67 +66,67 @@ int main(void)
     GpioCtrlRegs.GPADIR.bit.GPIO21 = 1;     // Output pin
 	EDIS;
 
-//TODO: OLED ÏÔÊ¾³õÊ¼»¯
+//TODO: OLED æ˜¾ç¤ºåˆå§‹åŒ–
     OLED_ColorTurn(0);
     OLED_ShowString(32,0,"YellowNew",16,1);
     OLED_ShowString(2,24,"Uac_out:",16,1);
     OLED_ShowString(2,48,"Udc_out:",16,1);
 
-//TODO: ³õÊ¼»¯ÈÎÎñÖ¸Õë
+//TODO: åˆå§‹åŒ–ä»»åŠ¡æŒ‡é’ˆ
 	Alpha_State_Ptr = &A0;
 	A_Task_Ptr = &A1;
 	B_Task_Ptr = &B1;
 
 	while(1)
 	{
-		// ×´Ì¬»úÈë¿Ú
+		// çŠ¶æ€æœºå…¥å£
 		//====================================
-		(*Alpha_State_Ptr)();	// ÁãÌø×ª (A0,B0,...)
+		(*Alpha_State_Ptr)();	// é›¶è·³è½¬ (A0,B0,...)
 		//====================================
 	}
 }
 
 //===================================
  /*
-  * ×´Ì¬»úµÚÁã½ÚµãÈÎÎñÓë¶¨²½³¤
+  * çŠ¶æ€æœºç¬¬é›¶èŠ‚ç‚¹ä»»åŠ¡ä¸å®šæ­¥é•¿
   */
 //====================================
 void A0(void)
 {
-	// AÈÎÎñÍ¬²½Ê±ÖÓÑ­»·µÈ´ı
+	// Aä»»åŠ¡åŒæ­¥æ—¶é’Ÿå¾ªç¯ç­‰å¾…
 	if(CpuTimer0Regs.TCR.bit.TIF == 1)
 	{
 		CpuTimer0Regs.TCR.bit.TIF = 1;	// clear flag
 
 		//-----------------------------------------------------------
-		(*A_Task_Ptr)();		// Ìø×ªÖÁAÈÎÎñ·ÖÖ§ (A1,A2,A3,...)
+		(*A_Task_Ptr)();		// è·³è½¬è‡³Aä»»åŠ¡åˆ†æ”¯ (A1,A2,A3,...)
 		//-----------------------------------------------------------
 	}
 
-	Alpha_State_Ptr = &B0;		// ÌøÈ¥B0
+	Alpha_State_Ptr = &B0;		// è·³å»B0
 }
 
 void B0(void)
 {
-	// AÈÎÎñÍ¬²½Ê±ÖÓÑ­»·µÈ´ı
+	// Aä»»åŠ¡åŒæ­¥æ—¶é’Ÿå¾ªç¯ç­‰å¾…
 	if(CpuTimer1Regs.TCR.bit.TIF == 1)
 	{
 		CpuTimer1Regs.TCR.bit.TIF = 1;				// clear flag
 
 		//-----------------------------------------------------------
-		(*B_Task_Ptr)();		//Ìø×ªÖÁBÈÎÎñ·ÖÖ§ (B1,B2,B3,...)
+		(*B_Task_Ptr)();		//è·³è½¬è‡³Bä»»åŠ¡åˆ†æ”¯ (B1,B2,B3,...)
 		//-----------------------------------------------------------
 
 	}
 
-	Alpha_State_Ptr = &A0;		// ÌøÈ¥A0
+	Alpha_State_Ptr = &A0;		// è·³å»A0
 }
 
 //-----------------------------------------------------------
  /*
-  * AÈÎÎñ·ÖÖ§
-  * A1£º²ÉÑùÊı¾İ´¦Àí
-  * A2£ºPID±Õ»·¿ØÖÆ
+  * Aä»»åŠ¡åˆ†æ”¯
+  * A1ï¼šé‡‡æ ·æ•°æ®å¤„ç†
+  * A2ï¼šPIDé—­ç¯æ§åˆ¶
   */
 //-----------------------------------------------------------
 void A1(void)
@@ -141,24 +141,24 @@ void A1(void)
 
     while(DmaRegs.CH1.CONTROL.bit.RUNSTS);
 
-//TODO: ½«DMA´«³öµÄÊı¾İÄÃ³öºóÁ¢¼´Æô¶¯ÏÂÒ»´Î×ª»»¡£
-//TODO: È¡A0²ÉÑù±í
+//TODO: å°†DMAä¼ å‡ºçš„æ•°æ®æ‹¿å‡ºåç«‹å³å¯åŠ¨ä¸‹ä¸€æ¬¡è½¬æ¢ã€‚
+//TODO: å–A0é‡‡æ ·è¡¨
         for(i=0;i<(2*ADC_DMATRSIZE-1);i+=2)
         {
                 *pYn_Adc_A0++ = *(P_DMABuf+i);
         }
-//TODO: È¡B0²ÉÑù±í
+//TODO: å–B0é‡‡æ ·è¡¨
         for(i=1;i<=(2*ADC_DMATRSIZE-1);i+=2)
         {
                 *pYn_Adc_B0++ = *(P_DMABuf+i);
         }
-//TODO: ÖØĞÂÆô¶¯DMA
+//TODO: é‡æ–°å¯åŠ¨DMA
     StartDMACH1();
-//TODO: ²ÉÑùÂË²¨
+//TODO: é‡‡æ ·æ»¤æ³¢
     pYn_Adc_A0 = m_adc.Yn_Adc_A0;
     pYn_Adc_B0 = m_adc.Yn_Adc_B0;
 
-        for(i=0;i<ADC_DMATRSIZE-1;i++)  // Á¬¸öFORÑ­»· Íê³É²ÉÑùÊı×éµÄ´ÓĞ¡µ½´óÅÅĞò
+        for(i=0;i<ADC_DMATRSIZE-1;i++)  // è¿ä¸ªFORå¾ªç¯ å®Œæˆé‡‡æ ·æ•°ç»„çš„ä»å°åˆ°å¤§æ’åº
         for(j=0;j<ADC_DMATRSIZE-1-i;j++)
         {
             if(*(pYn_Adc_A0+j)>*(pYn_Adc_A0+j+1))
@@ -176,20 +176,20 @@ void A1(void)
             }
         }
         m_adc.sumA0=0,m_adc.sumB0=0;
-        for(i=0;i<10;i++)   //È¡×îÖĞ¼äµÄÊ®¸öÊı
+        for(i=0;i<10;i++)   //å–æœ€ä¸­é—´çš„åä¸ªæ•°
         {
             m_adc.sumA0+=*(pYn_Adc_A0+i+10);
             m_adc.sumB0+=*(pYn_Adc_B0+i+10);
         }
-        m_adc.Voltage_A0=(m_adc.sumA0/10.0*3.0/4096.0);    //°´ÕÕ¹«Ê½×ª»»µçÑ¹
-        m_adc.Voltage_B0=(m_adc.sumB0/10.0*3.0/4096.0);    //°´ÕÕ¹«Ê½×ª»»µçÑ¹
+        m_adc.Voltage_A0=(m_adc.sumA0/10.0*3.0/4096.0);    //æŒ‰ç…§å…¬å¼è½¬æ¢ç”µå‹
+        m_adc.Voltage_B0=(m_adc.sumB0/10.0*3.0/4096.0);    //æŒ‰ç…§å…¬å¼è½¬æ¢ç”µå‹
 
 #if SCOPE_FRE
-            //TODO: ¼àÊÓÆµÂÊÊÇ·ñÕıÈ·
+            //TODO: ç›‘è§†é¢‘ç‡æ˜¯å¦æ­£ç¡®
        GpioDataRegs.GPADAT.bit.GPIO20 = ~GpioDataRegs.GPADAT.bit.GPIO20;
 #endif
 
-	A_Task_Ptr = &A2;	// ÌøÈ¥A2
+	A_Task_Ptr = &A2;	// è·³å»A2
 }
 
 void A2(void)
@@ -199,7 +199,7 @@ void A2(void)
 //  Float_Printf(Str,m_PidInverter.ActualSpeed,1,3);
 //  UARTa_SendString((char *)"\n");
 
-//TODO: Boost ±Õ»·ÈíÆğ¶¯
+//TODO: Boost é—­ç¯è½¯èµ·åŠ¨
 if (m_PidBoost.Soft_Start > Star_Flag)
     {m_PidBoost.Soft_Start--;}
 else if (m_PidBoost.Soft_Start <= Star_Flag)
@@ -253,13 +253,13 @@ if(m_PidBoost.Soft_Start == Star_Flag)
 # endif
 
 
-	A_Task_Ptr = &A1; 	// ÌøÈ¥A1
+	A_Task_Ptr = &A1; 	// è·³å»A1
 }
 
 //-----------------------------------------------------------
  /*
-  * BÈÎÎñ·ÖÖ§
-  * B1£º
+  * Bä»»åŠ¡åˆ†æ”¯
+  * B1ï¼š
   */
 //--------j---------------------------------------------------
 void B1(void)
@@ -273,7 +273,7 @@ void B1(void)
     Float2Str(Str,temp1,2,2);
     OLED_ShowString(72,56,(unsigned char *)Str,8,1);
 
-//TODO: ¼àÊÓÆµÂÊÊÇ·ñÕıÈ·
+//TODO: ç›‘è§†é¢‘ç‡æ˜¯å¦æ­£ç¡®
 # if SCOPE_FRE
     GpioDataRegs.GPADAT.bit.GPIO21 = ~GpioDataRegs.GPADAT.bit.GPIO21;
 # endif
